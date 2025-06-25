@@ -1,36 +1,64 @@
-# This is a configuration file for Codemagic.io
-# It tells the cloud build machine how to build your app.
+# This is a comment. In YAML, comments start with a '#'
 
+# The 'workflows' section is the top-level container for all your build pipelines.
 workflows:
-  capacitor-ios-build: # You can name this workflow anything you like
+  # This is the unique ID for your workflow. You can name it anything you like.
+  capacitor-ios-build:
+    # This is the human-readable name that will appear in the Codemagic UI.
     name: Build Capacitor iOS App
-    instance_type: mac_mini_m2 # Use an Apple Silicon M2 machine
+
+    # The 'environment' section defines the virtual machine that will run your build.
     environment:
-      node: 18 # Specify the version of Node.js to use
+      # Specify the version of Node.js you need.
+      node: 20.15.1
+      # Specify the Xcode version. Let's use the one from your build logs.
+      xcode: 16.3
+      # Specify the macOS version that corresponds to the Xcode version.
+      macos: sonoma
+      # Explicitly include CocoaPods, which is needed for 'pod install'.
+      cocoapods: default
+
+    # The 'scripts' section contains the sequence of commands to run.
     scripts:
-      - name: Install Dependencies and Prepare iOS Project
-        script: | 
-          set -x # This will print all commands for easier debugging
-          
-          # Install Node dependencies
+      - name: Install npm dependencies
+        script: |
+          # Exit immediately if a command fails
+          set -e
+          echo "Installing npm dependencies..."
           npm install
-          
-          # FIX: Manually add execute permission to the Capacitor CLI
-          chmod +x ./node_modules/.bin/cap
-          
-          # Sync the web assets to the native project
-          ./node_modules/.bin/cap sync ios
-          
-          # Install iOS CocoaPods dependencies
-          cd ios/App
-          pod install
+
+      - name: Sync Capacitor project
+        script: |
+          set -e
+          echo "Syncing Capacitor project and installing pods..."
+          # This command copies your web assets and runs 'pod install'
+          # which generates the required App.xcworkspace file.
+          npx cap sync ios
+
       - name: Build for iOS Simulator
-        script: | 
-          set -x # This will print all commands for easier debugging
-          xcodebuild build -workspace App.xcworkspace \
-                           -scheme App \
-                           -sdk iphonesimulator \
-                           -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+        script: |
+          set -e
+          echo "Starting Xcode build for Simulator..."
+          # Navigate into the native iOS project directory
+          cd ios/App
+          # Run the xcodebuild command
+          xcodebuild build \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+
+    # The 'artifacts' section tells Codemagic where to find the final build files
+    # so you can download them.
     artifacts:
-      # This tells Codemagic where to find the final app file
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app
+
+    # The 'publishing' section is optional. You can use it to get notified
+    # about your build status via email or Slack.
+    publishing:
+      email:
+        recipients:
+          - bakhoaleingermany@gmail.com # <-- CHANGE THIS to your actual email address
+        notify:
+          success: true # Send an email when the build succeeds
+          failure: true # Send an email when the build fails
