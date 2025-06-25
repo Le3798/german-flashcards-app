@@ -1,0 +1,30 @@
+# This is a configuration file for Codemagic.io
+# It tells the cloud build machine how to build your app.
+
+workflows:
+  capacitor-ios-build: # You can name this workflow anything you like
+    name: Build Capacitor iOS App
+    instance_type: mac_mini_m1 # Use an Apple Silicon M1 machine
+    environment:
+      node: 18 # Specify the version of Node.js to use
+    scripts:
+      - name: Install npm dependencies
+        script: | 
+          npm install
+      - name: Sync Capacitor project
+        script: | 
+          npx cap sync ios
+      - name: Install iOS dependencies (CocoaPods)
+        script: | 
+          cd ios/App # Navigate into the correct iOS sub-directory
+          pod install
+      - name: Build for iOS Simulator
+        script: | 
+          set -x # This will print all commands for easier debugging
+          xcodebuild build -workspace App.xcworkspace \
+                           -scheme App \
+                           -sdk iphonesimulator \
+                           -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+    artifacts:
+      # This tells Codemagic where to find the final app file
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
