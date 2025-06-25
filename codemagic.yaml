@@ -1,5 +1,3 @@
-# This is a comment. In YAML, comments start with a '#'
-
 # The 'workflows' section is the top-level container for all your build pipelines.
 workflows:
   # This is the unique ID for your workflow. You can name it anything you like.
@@ -8,13 +6,12 @@ workflows:
     name: Build Capacitor iOS App
 
     # The 'environment' section defines the virtual machine that will run your build.
+    # The macOS version is selected automatically based on the Xcode version.
     environment:
       # Specify the version of Node.js you need.
       node: 20.15.1
-      # Specify the Xcode version. Let's use the one from your build logs.
+      # Specify the Xcode version.
       xcode: 16.3
-      # Specify the macOS version that corresponds to the Xcode version.
-      macos: sonoma
       # Explicitly include CocoaPods, which is needed for 'pod install'.
       cocoapods: default
 
