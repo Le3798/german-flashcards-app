@@ -40,12 +40,12 @@ workflows:
           echo "Starting Xcode build for Simulator..."
           # Navigate into the native iOS project directory
           cd ios/App
-          # Run the xcodebuild command
+          # Run the xcodebuild command with an available device name
           xcodebuild build \
             -workspace App.xcworkspace \
             -scheme App \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
 
     # The 'artifacts' section tells Codemagic where to find the final build files
     # so you can download them.
