@@ -6,7 +6,6 @@ workflows:
     name: Build Capacitor iOS App
 
     # The 'environment' section defines the virtual machine that will run your build.
-    # The macOS version is selected automatically based on the Xcode version.
     environment:
       # Specify the version of Node.js you need.
       node: 20.15.1
@@ -27,9 +26,12 @@ workflows:
       - name: Sync Capacitor project
         script: |
           set -e
+          # FIX: Manually add execute permission to the Capacitor CLI
+          echo "Setting execute permissions for Capacitor CLI..."
+          chmod +x ./node_modules/.bin/cap
+
           echo "Syncing Capacitor project and installing pods..."
           # This command copies your web assets and runs 'pod install'
-          # which generates the required App.xcworkspace file.
           npx cap sync ios
 
       - name: Build for iOS Simulator
@@ -50,8 +52,7 @@ workflows:
     artifacts:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app
 
-    # The 'publishing' section is optional. You can use it to get notified
-    # about your build status via email or Slack.
+    # The 'publishing' section is optional.
     publishing:
       email:
         recipients:
