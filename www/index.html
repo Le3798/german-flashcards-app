@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German A1 Flashcards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* * All styles are prefixed with #german-flashcard-container 
+         * to prevent conflicts with existing blog styles.
+         */
+        #german-flashcard-container {
+            font-family: 'Inter', sans-serif;
+            position: relative; /* Needed for button positioning */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            margin: 2rem auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* --- DEFAULT DARK MODE THEME --- */
+        #german-flashcard-container {
+            background-color: #1a202c;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        #german-flashcard-container .gfc-header h2 { color: #e2e8f0; }
+        #german-flashcard-container .gfc-header p { color: #a0aec0; }
+        #german-flashcard-container .gfc-card-face { border: 1px solid #4a5568; }
+        #german-flashcard-container .gfc-card-face--front { background-color: #2d3748; color: #e2e8f0; }
+        #german-flashcard-container .gfc-card-face--back { background-color: #2d3748; color: #e2e8f0; }
+        #german-flashcard-container .gfc-gender { color: #a0aec0; font-size: 1.25rem; margin-bottom: 0.5rem; }
+        #german-flashcard-container .gfc-translation, .gfc-translation-vi { color: #cbd5e0; }
+        #german-flashcard-container .gfc-tap-hint { color: #718096; }
+        #german-flashcard-container .gfc-button { background-color: #4a5568; border: 1px solid #718096; color: #e2e8f0; }
+        #german-flashcard-container .gfc-button:hover { background-color: #718096; }
+        #german-flashcard-container .gfc-button:disabled { background-color: #2d3748; opacity: 0.4; cursor: not-allowed; }
+        #german-flashcard-container .gfc-progress { color: #a0aec0; }
+        #german-flashcard-container .gfc-advanced-controls { background-color: #2d3748; }
+        #german-flashcard-container .gfc-filter-select { border: 1px solid #718096; background-color: #4a5568; color: #e2e8f0; }
+        #german-flashcard-container .gfc-mark-learned { color: #a0aec0; }
+        #german-flashcard-container .gfc-shuffle-button { background-color: #38A1ac; color: white; border: none; }
+        #german-flashcard-container .gfc-shuffle-button:hover { background-color: #319795; }
+        
+        /* New styles for user categories */
+        #german-flashcard-container .gfc-user-categories-section {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            background-color: #2d3748; /* Dark theme */
+        }
+        #german-flashcard-container .gfc-user-categories-section h4 {
+            color: #e2e8f0;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        #german-flashcard-container .gfc-user-category-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        #german-flashcard-container .gfc-user-category-input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #718096;
+            background-color: #4a5568;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+        #german-flashcard-container .gfc-user-category-input::placeholder {
+            color: #a0aec0;
+        }
+        #german-flashcard-container .gfc-add-category-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #38A1ac;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+        #german-flashcard-container .gfc-add-category-btn:hover {
+            background-color: #319795;
+        }
+        #german-flashcard-container .gfc-current-user-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        #german-flashcard-container .gfc-user-category-tag {
+            background-color: #718096;
+            color: #e2e8f0;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        #german-flashcard-container .gfc-remove-category-btn {
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            line-height: 1;
+            padding: 0;
+            margin: 0;
+        }
+        #german-flashcard-container .gfc-remove-category-btn:hover {
+            color: #ff5252;
+        }
+
+        /* --- LIGHT THEME OVERRIDES --- */
+        #german-flashcard-container.light-theme {
+            background-color: #f0f2f5;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        #german-flashcard-container.light-theme .gfc-header h2 { color: #1A102c; }
+        #german-flashcard-container.light-theme .gfc-header p { color: #4a5568; }
+        #german-flashcard-container.light-theme .gfc-card-face { border: 1px solid #e2e8f0; }
+        #german-flashcard-container.light-theme .gfc-card-face--front { background-color: #ffffff; color: #1A102c; }
+        #german-flashcard-container.light-theme .gfc-card-face--back { background-color: #ffffff; color: #2d3748; }
+        #german-flashcard-container.light-theme .gfc-gender { color: #718096; }
+        #german-flashcard-container.light-theme .gfc-translation, .gfc-translation-vi { color: #4a5568; }
+        #german-flashcard-container.light-theme .gfc-tap-hint { color: #a0aec0; }
+        #german-flashcard-container.light-theme .gfc-button { background-color: #ffffff; border: 1px solid #cbd5e0; color: #2d3748; }
+        #german-flashcard-container.light-theme .gfc-button:hover { background-color: #edf2f7; }
+        #german-flashcard-container.light-theme .gfc-button:disabled { background-color: #edf2f7; opacity: 0.5; cursor: not-allowed; }
+        #german-flashcard-container.light-theme .gfc-progress { color: #4a5568; }
+        #german-flashcard-container.light-theme .gfc-advanced-controls { background-color: #edf2f7; }
+        #german-flashcard-container.light-theme .gfc-filter-select { border: 1px solid #cbd5e0; background-color: #fff; color: #2d3748; }
+        #german-flashcard-container.light-theme .gfc-mark-learned { color: #4a5568; }
+        #german-flashcard-container.light-theme .gfc-shuffle-button { color: #2d3748; }
+
+        /* New light theme styles for user categories */
+        #german-flashcard-container.light-theme .gfc-user-categories-section {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+        #german-flashcard-container.light-theme .gfc-user-categories-section h4 {
+            color: #1A102c;
+        }
+        #german-flashcard-container.light-theme .gfc-user-category-input {
+            border: 1px solid #cbd5e0;
+            background-color: #f7fafc;
+            color: #2d3748;
+        }
+        #german-flashcard-container.light-theme .gfc-user-category-input::placeholder {
+            color: #a0aec0;
+        }
+        #german-flashcard-container.light-theme .gfc-add-category-btn {
+            background-color: #38A1ac;
+            color: white;
+        }
+        #german-flashcard-container.light-theme .gfc-add-category-btn:hover {
+            background-color: #319795;
+        }
+        #german-flashcard-container.light-theme .gfc-user-category-tag {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+        }
+        #german-flashcard-container.light-theme .gfc-remove-category-btn {
+            color: #718096;
+        }
+        #german-flashcard-container.light-theme .gfc-remove-category-btn:hover {
+            color: #ff5252;
+        }
+        
+        /* Header section */
+        #german-flashcard-container .gfc-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-top: 2rem; /* Add padding to make space for buttons */
+        }
+        #german-flashcard-container .gfc-header h2 { font-family: 'Noto Sans', sans-serif; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem 0; }
+        #german-flashcard-container .gfc-header p { font-size: 1rem; margin: 0; }
+
+        /* Card styles */
+        #german-flashcard-container .gfc-card-scene { width: 100%; max-width: 400px; height: 280px; perspective: 1000px; margin-bottom: 1.5rem; }
+        #german-flashcard-container .gfc-card { width: 100%; height: 100%; position: relative; cursor: pointer; transition: transform 0.8s; transform-style: preserve-3d; -webkit-tap-highlight-color: transparent; }
+        #german-flashcard-container .gfc-card.is-flipped { transform: rotateY(180deg); }
+        #german-flashcard-container .gfc-card-face { position: absolute; height: 100%; width: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem 1rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); text-align: center; box-sizing: border-box; overflow-y: auto; }
+        #german-flashcard-container .gfc-card-face--back { transform: rotateY(180deg); justify-content: flex-start; text-align: left; }
+        #german-flashcard-container .gfc-word { font-size: 2.25rem; font-weight: 700; margin: 0; }
+        #german-flashcard-container .gfc-main-translation { font-size: 1.5rem; font-weight: 600; margin: 0 0 1rem 0; width: 100%; text-align: center; }
+        #german-flashcard-container .gfc-example { font-size: 0.9rem; font-style: italic; opacity: 0.9; margin: 0.25rem 0 0 0; }
+        #german-flashcard-container .gfc-tap-hint { position: absolute; bottom: 15px; font-size: 0.8rem; }
+        
+        /* Controls */
+        #german-flashcard-container .gfc-controls { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        #german-flashcard-container .gfc-button { padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; user-select: none; display: flex; align-items: center; justify-content: center; }
+        #german-flashcard-container .gfc-button.icon-button { width: 48px; height: 48px; }
+        #german-flashcard-container .gfc-button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+        #german-flashcard-container .gfc-progress { font-size: 1rem; font-weight: 500; }
+        #german-flashcard-container .gfc-advanced-controls { width: 100%; max-width: 400px; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; padding: 1rem; border-radius: 0.75rem; }
+        #german-flashcard-container .gfc-filter-select { padding: 0.5rem; border-radius: 0.5rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; cursor: pointer; }
+        #german-flashcard-container .gfc-mark-learned { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; }
+        #german-flashcard-container .gfc-mark-learned input { cursor: pointer; width: 1.15em; height: 1.15em; }
+        
+        /* Corner Buttons (Theme & Language) */
+        .gfc-corner-button { position: absolute; top: 1rem; background: none; border: none; cursor: pointer; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #a0aec0; transition: background-color 0.2s ease, color 0.2s ease; }
+        .gfc-corner-button:hover { background-color: #4a5568; }
+        #german-flashcard-container.light-theme .gfc-corner-button:hover { background-color: #e2e8f0; }
+        .gfc-corner-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        
+        #gfc-theme-toggle-btn { right: 1rem; }
+        #gfc-lang-toggle-btn { left: 1rem; font-weight: 700; font-size: 0.8rem; padding: 0.5rem 0.75rem; border-radius: 1rem; }
+
+        .gfc-hidden { display: none !important; }
+
+        /* Styles for the new back card structure */
+        #german-flashcard-container.light-theme .gfc-topic-label { color: #2B6CB0; }
+        #german-flashcard-container.light-theme .gfc-example-divider { border-top: 1px solid #e2e8f0; }
+
+        #german-flashcard-container .gfc-topic-label {
+            color: #63B3ED; 
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        #german-flashcard-container .gfc-example-divider {
+            border: none;
+            border-top: 1px solid #4a5568;
+            margin: 0.75rem 0;
+            width: 100%;
+        }
+        #german-flashcard-container .gfc-example-block {
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="german-flashcard-container">
+        <button id="gfc-theme-toggle-btn" class="gfc-corner-button" data-en-title="Toggle theme" data-vi-title="Chuyển đổi giao diện">
+            <svg id="gfc-theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="gfc-theme-icon-moon" class="gfc-hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button id="gfc-lang-toggle-btn" class="gfc-corner-button">EN | VI</button>
+
+        <div class="gfc-header">
+            <h2 id="gfc-main-title" data-en="German A1 Vocabulary" data-vi="Từ vựng tiếng Đức A1"></h2>
+            <p id="gfc-subtitle" data-en="Click the card to see the translation." data-vi="Nhấp vào thẻ để xem bản dịch."></p>
+        </div>
+
+        <div class="gfc-card-scene">
+            <div class="gfc-card" id="gfc-card">
+                <div class="gfc-card-face gfc-card-face--front">
+                    <p class="gfc-gender" id="gfc-gender"></p>
+                    <h3 class="gfc-word" id="gfc-word-front">Loading...</h3>
+                    <span id="gfc-tap-hint" class="gfc-tap-hint" data-en="Tap to flip" data-vi="Nhấn để lật"></span>
+                </div>
+                <div class="gfc-card-face gfc-card-face--back" id="gfc-card-back-content">
+                    <!-- This content is generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="gfc-controls">
+            <button class="gfc-button icon-button" id="gfc-prev-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="gfc-progress" id="gfc-progress-indicator">0 / 0</div>
+            <button class="gfc-button icon-button" id="gfc-next-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+        
+        <div class="gfc-advanced-controls">
+            <button class="gfc-button icon-button gfc-shuffle-button" id="gfc-shuffle-btn" data-en-title="Shuffle Deck" data-vi-title="Trộn bộ bài">
+                <svg fill="currentColor" width="24" height="24" viewBox="0 0 24 24" id="shuffle" data-name="Flat Line" xmlns="http://www.w3.org/2000/svg" class="icon flat-line">
+                    <path id="primary" d="M3,8H5.28a6,6,0,0,1,4.51,2.05L13.21,14A6,6,0,0,0,17.72,16H21" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path>
+                    <polyline id="primary-2" data-name="primary" points="19 14 21 16 19 18" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></polyline>
+                    <path id="primary-3" data-name="primary" d="M21,8H17.72a6,6,0,0,0-4.51,2.05L9.79,14A6,6,0,0,1,5.28,16H3" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path>
+                    <polyline id="primary-4" data-name="primary" points="19 6 21 8 19 10" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></polyline>
+                </svg>
+            </button>
+            
+            <select id="gfc-topic-filter" class="gfc-filter-select">
+                <option value="all" data-en="All Topics" data-vi="Tất cả chủ đề"></option>
+            </select>
+            
+            <select id="gfc-filter" class="gfc-filter-select">
+                <option value="all" data-en="Show All" data-vi="Hiển thị tất cả"></option>
+                <option value="not-learned" data-en="Not Learned" data-vi="Chưa học"></option>
+                <option value="learned" data-en="Learned" data-vi="Đã học"></option>
+            </select>
+            
+            <label class="gfc-mark-learned">
+                <input type="checkbox" id="gfc-learned-checkbox">
+                <span id="gfc-mark-learned-label" data-en="Mark as learned" data-vi="Đánh dấu đã học"></span>
+            </label>
+        </div>
+
+        <div class="gfc-user-categories-section">
+            <h4 id="gfc-user-cat-title" data-en="Your Custom Topics" data-vi="Chủ đề tùy chỉnh của bạn"></h4>
+            <div class="gfc-user-category-input-group">
+                <input type="text" id="gfc-new-category-input" class="gfc-user-category-input" data-en-placeholder="Work, Transport, ..." data-vi-placeholder="Công việc, Giao thông, ...">
+                <button id="gfc-add-category-btn" class="gfc-add-category-btn" data-en="Add Topic" data-vi="Thêm chủ đề"></button>
+            </div>
+            <div class="gfc-current-user-categories" id="gfc-current-user-categories">
+            </div>
+        </div>
+        <div id="gfc-dynamic-translations" class="gfc-hidden">
+            <span data-key="empty-title" data-en="No Cards" data-vi="Không có thẻ"></span>
+            <span data-key="empty-subtitle" data-en="Adjust your filters or check the data source." data-vi="Hãy điều chỉnh bộ lọc hoặc kiểm tra lại nguồn dữ liệu."></span>
+            <span data-key="word-types-header" data-en="Word Types" data-vi="Loại từ"></span>
+            <span data-key="custom-topics-header" data-en="Custom Topics" data-vi="Chủ đề tùy chỉnh"></span>
+        </div>
+    </div>
+    <script>
+(() => {
+    const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzNO9EDbl5GNG41elsdweS0mE6jjVSRyT40l_MkixeT7nFHO5izQ4AxnBXIkdhSmPl7kB3FxyMY23h/pub?gid=0&single=true&output=csv';
+
+    // --- STATE ---
+    let allCardsData = [];
+    let currentCards = [];
+    let currentIndex = 0;
+    let isFlipped = false;
+    let currentLanguage = 'en';
+    let activeTopicFilter = 'all';
+    let activeLearnedFilter = 'all';
+
+    const learnedStorageKey = 'germanFlashcardsLearnedData_A1_v4';
+    const themeStorageKey = 'germanFlashcardsTheme_A1';
+    const langStorageKey = 'germanFlashcardsLang_A1';
+    const cacheDataKey = 'germanFlashcardsDataCache_A1_v4';
+    const cacheTimestampKey = 'germanFlashcardsTimestampCache_A1_v4';
+    const cacheDuration = 1 * 60 * 1000;
+
+    // MODIFIED: Simplified to a global topic store
+    let userCardCategories = {}; 
+    const userCategoriesStorageKey = 'gfcUserCategories_A1_v4';
+
+    // --- DOM Elements ---
+    const container = document.getElementById('german-flashcard-container');
+    const themeToggleButton = document.getElementById('gfc-theme-toggle-btn');
+    const themeIconSun = document.getElementById('gfc-theme-icon-sun');
+    const themeIconMoon = document.getElementById('gfc-theme-icon-moon');
+    const langToggleButton = document.getElementById('gfc-lang-toggle-btn');
+    const cardElement = document.getElementById('gfc-card');
+    const wordFrontElement = document.getElementById('gfc-word-front');
+    const genderElement = document.getElementById('gfc-gender');
+    const cardBackContent = document.getElementById('gfc-card-back-content');
+    const prevBtn = document.getElementById('gfc-prev-btn');
+    const nextBtn = document.getElementById('gfc-next-btn');
+    const progressIndicator = document.getElementById('gfc-progress-indicator');
+    const shuffleBtn = document.getElementById('gfc-shuffle-btn');
+    const filterSelect = document.getElementById('gfc-filter');
+    const learnedCheckbox = document.getElementById('gfc-learned-checkbox');
+    const topicFilterSelect = document.getElementById('gfc-topic-filter');
+    const translatableElements = document.querySelectorAll('[data-en], [data-en-placeholder]');
+    const newUserCategoryInput = document.getElementById('gfc-new-category-input');
+    const addCategoryBtn = document.getElementById('gfc-add-category-btn');
+    const currentUserCategoriesContainer = document.getElementById('gfc-current-user-categories');
+
+    // --- DATA FETCHING & CACHING ---
+    async function fetchAndParseSheetData() {
+        if (!googleSheetCsvUrl) {
+            showErrorState("Google Sheet URL is not set.");
+            return null;
+        }
+        try {
+            const response = await fetch(`${googleSheetCsvUrl}&t=${new Date().getTime()}`);
+            if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+            const csvText = await response.text();
+            localStorage.setItem(cacheDataKey, csvText);
+            localStorage.setItem(cacheTimestampKey, Date.now().toString());
+            return parseCSV(csvText).map((card, index) => ({ ...card, id: index, learned: false }));
+        } catch (error) {
+            console.error("Failed to fetch or parse sheet data:", error);
+            showErrorState("Error loading card data. Check URL/share settings.");
+            return null;
+        }
+    }
+
+    function getCachedData() {
+        try {
+            const cachedCsv = localStorage.getItem(cacheDataKey);
+            const cachedTimestamp = localStorage.getItem(cacheTimestampKey);
+            if (cachedCsv && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp, 10)) < cacheDuration) {
+                console.log("Loading data from cache.");
+                return parseCSV(cachedCsv).map((card, index) => ({ ...card, id: index, learned: false }));
+            }
+        } catch (e) { console.error("Could not read from cache", e); }
+        return null;
+    }
+
+    function parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const data = [];
+        const csvRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]*))(?:,|$)/g;
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue;
+            const values = [];
+            let match;
+            csvRegex.lastIndex = 0;
+            while (match = csvRegex.exec(lines[i])) {
+                let value = match[1] !== undefined ? match[1].replace(/""/g, '"') : match[2];
+                values.push(value);
+                if (match.index + match[0].length === lines[i].length) {
+                    if (lines[i].endsWith(',') && values.length < headers.length) values.push('');
+                    break;
+                }
+            }
+            while (values.length < headers.length) values.push('');
+            if (values.length !== headers.length) continue;
+            const entry = {};
+            headers.forEach((header, j) => {
+                entry[header] = (values[j] || '').trim();
+            });
+            entry.wortarten = (entry['Wortart'] || 'Uncategorized').split(',').map(s => s.trim());
+            entry.wordTypes = (entry['Word Type'] || 'Uncategorized').split(',').map(s => s.trim());
+            entry.tuLoai = (entry['Từ loại'] || 'Chưa phân loại').split(',').map(s => s.trim());
+            data.push(entry);
+        }
+        return data;
+    }
+
+    // --- UI & LANGUAGE FUNCTIONS ---
+    function updateUIText(lang) {
+        currentLanguage = lang;
+        translatableElements.forEach(el => {
+            if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            if (el.dataset[`${lang}Placeholder`]) el.placeholder = el.dataset[`${lang}Placeholder`];
+            if (el.dataset[`${lang}Title`]) el.title = el.dataset[`${lang}Title`];
+        });
+        populateTopicFilter(); 
+        filterCards(); 
+        if (currentCards.length > 0) {
+            updateCardLanguage();
+            renderUserCategoriesForCurrentCard();
+        } else {
+            showEmptyState();
+        }
+    }
+    
+    // --- CARD & STATE FUNCTIONS ---
+    function updateCardLanguage() {
+        if (currentIndex >= currentCards.length || currentIndex < 0) return;
+        const cardData = currentCards[currentIndex];
+        cardBackContent.innerHTML = '';
+        const mainTranslation = currentLanguage === 'en' ? cardData.english : cardData.vietnamese;
+        const mainTranslationHTML = `<p class="gfc-main-translation">${mainTranslation}</p>`;
+        cardBackContent.insertAdjacentHTML('beforeend', mainTranslationHTML);
+
+        let currentLangWordTypes = currentLanguage === 'en' ? cardData.wordTypes : cardData.tuLoai;
+
+        const createExampleHTML = (example, exampleTranslation) => {
+            return `<p class="gfc-example">"${example}" (${exampleTranslation})</p>`;
+        };
+
+        if (cardData.wortarten.length === 1 && cardData.wortarten[0]) {
+            const wortart = cardData.wortarten[0];
+            const wordTypeLabel = currentLangWordTypes[0] || wortart;
+            const example1 = cardData.example1;
+            const example2 = cardData.example2;
+
+            if (example1) {
+                const exampleTrans1 = currentLanguage === 'en' ? cardData.englishExample1 : cardData.vietnameseExample1;
+                let blockHTML = `<div class="gfc-example-block"><strong class="gfc-topic-label">${wordTypeLabel}</strong>${createExampleHTML(example1, exampleTrans1)}`;
+                if (example2) {
+                    const exampleTrans2 = currentLanguage === 'en' ? cardData.englishExample2 : cardData.vietnameseExample2;
+                    blockHTML += createExampleHTML(example2, exampleTrans2);
+                }
+                blockHTML += '</div>';
+                cardBackContent.insertAdjacentHTML('beforeend', blockHTML);
+            }
+        } else {
+            cardData.wortarten.forEach((wortart, i) => {
+                const exampleKey = `example${i + 1}`;
+                const example = cardData[exampleKey];
+                if (!example) return;
+
+                const exampleTranslation = currentLanguage === 'en' ? cardData[`englishExample${i + 1}`] : cardData[`vietnameseExample${i + 1}`];
+                const wordTypeLabel = currentLangWordTypes[i] || wortart;
+                if (i > 0) cardBackContent.insertAdjacentHTML('beforeend', '<hr class="gfc-example-divider">');
+                const exampleBlockHTML = `<div class="gfc-example-block"><strong class="gfc-topic-label">${wordTypeLabel}</strong>${createExampleHTML(example, exampleTranslation)}</div>`;
+                cardBackContent.insertAdjacentHTML('beforeend', exampleBlockHTML);
+            });
+        }
+    }
+
+    function renderCard() {
+        if (currentCards.length === 0) {
+            showEmptyState();
+            return;
+        }
+        if (currentIndex >= currentCards.length) currentIndex = 0;
+        
+        const cardData = currentCards[currentIndex];
+        if (isFlipped) flipCard(false); 
+        
+        wordFrontElement.textContent = cardData.german;
+        genderElement.textContent = cardData.gender || ''; 
+        
+        updateCardLanguage(); 
+        
+        learnedCheckbox.checked = cardData.learned;
+        updateProgress();
+        updateNavButtons();
+        renderUserCategoriesForCurrentCard();
+    }
+    
+    function populateTopicFilter() {
+        const sheetTopics = [];
+        const userTopics = [];
+        const allAvailableTopics = new Set();
+
+        allCardsData.forEach(card => {
+            card.wortarten.forEach((wortart, i) => {
+                if (wortart && !allAvailableTopics.has(wortart)) {
+                    allAvailableTopics.add(wortart);
+                    sheetTopics.push({
+                        type: 'sheet',
+                        de: wortart,
+                        en: card.wordTypes[i] || wortart,
+                        vi: card.tuLoai[i] || wortart
+                    });
+                }
+            });
+        });
+        
+        Object.values(userCardCategories).flat().forEach(userTopic => {
+            if (userTopic && !allAvailableTopics.has(userTopic)) {
+                allAvailableTopics.add(userTopic);
+                userTopics.push({
+                    type: 'user', de: userTopic, en: userTopic, vi: userTopic
+                });
+            }
+        });
+        
+        // FIXED: The core of the new logic. If the active filter isn't in the current set,
+        // it's a "ghost" from another language. We still add it so it can be selected.
+        if (activeTopicFilter !== 'all' && !allAvailableTopics.has(activeTopicFilter)) {
+             userTopics.push({
+                type: 'user', de: activeTopicFilter, en: activeTopicFilter, vi: activeTopicFilter
+            });
+        }
+
+        sheetTopics.sort((a, b) => (a.de || '').localeCompare(b.de || ''));
+        userTopics.sort((a, b) => (a.de || '').localeCompare(b.de || ''));
+
+        while (topicFilterSelect.children.length > 1) {
+            topicFilterSelect.removeChild(topicFilterSelect.lastChild);
+        }
+
+        const wordTypesHeaderText = document.querySelector('[data-key="word-types-header"]').dataset[currentLanguage];
+        const customTopicsHeaderText = document.querySelector('[data-key="custom-topics-header"]').dataset[currentLanguage];
+
+        if (sheetTopics.length > 0) {
+            const sheetOptgroup = document.createElement('optgroup');
+            sheetOptgroup.label = wordTypesHeaderText;
+            sheetTopics.forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic.de;
+                option.textContent = topic[currentLanguage] || topic.de;
+                sheetOptgroup.appendChild(option);
+            });
+            topicFilterSelect.appendChild(sheetOptgroup);
+        }
+
+        const userOptgroup = document.createElement('optgroup');
+        userOptgroup.label = customTopicsHeaderText;
+        userTopics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic.de;
+            option.textContent = topic[currentLanguage] || topic.de;
+            userOptgroup.appendChild(option);
+        });
+        topicFilterSelect.appendChild(userOptgroup);
+        
+        topicFilterSelect.value = activeTopicFilter;
+    }
+
+
+    function filterCards() {
+        const currentId = currentCards.length > 0 ? currentCards[currentIndex]?.id : null;
+
+        let filteredDeck = allCardsData.filter(card => {
+            const matchesTopic = (activeTopicFilter === 'all') || 
+                                 (card.wortarten.includes(activeTopicFilter)) || 
+                                 (card.userTopics && card.userTopics.includes(activeTopicFilter));
+            
+            const matchesLearnedStatus = (activeLearnedFilter === 'all') ||
+                                         (activeLearnedFilter === 'learned' && card.learned) ||
+                                         (activeLearnedFilter === 'not-learned' && !card.learned);
+            
+            return matchesTopic && matchesLearnedStatus;
+        });
+
+        currentCards = [...filteredDeck];
+        const newIndex = currentId !== null ? currentCards.findIndex(card => card.id === currentId) : -1;
+        currentIndex = newIndex !== -1 ? newIndex : 0;
+        renderCard();
+    }
+    
+    // --- PERSISTENCE & CATEGORY MANAGEMENT ---
+    
+    function toggleLanguage() {
+        const newLang = currentLanguage === 'en' ? 'vi' : 'en';
+        updateUIText(newLang);
+        try { localStorage.setItem(langStorageKey, newLang); } catch (e) { console.error("Failed to save language state:", e); }
+    }
+
+    function loadLanguage() {
+        currentLanguage = localStorage.getItem(langStorageKey) || 'en';
+    }
+    
+    function loadUserCategories() {
+        try {
+            const savedUserCategories = localStorage.getItem(userCategoriesStorageKey);
+            userCardCategories = savedUserCategories ? JSON.parse(savedUserCategories) : {};
+            allCardsData.forEach(card => {
+                card.userTopics = userCardCategories[card.id] || [];
+            });
+        } catch (e) { console.error("Failed to load user categories:", e); }
+    }
+
+    function saveUserCategories() {
+        try {
+            localStorage.setItem(userCategoriesStorageKey, JSON.stringify(userCardCategories));
+        } catch (e) { console.error("Failed to save user categories:", e); }
+    }
+    
+    function renderUserCategoriesForCurrentCard() {
+        currentUserCategoriesContainer.innerHTML = '';
+        if (currentCards.length === 0) return;
+
+        const cardData = currentCards[currentIndex];
+        const topics = cardData.userTopics || [];
+
+        topics.forEach(topic => {
+            const tag = document.createElement('span');
+            tag.className = 'gfc-user-category-tag';
+            tag.textContent = topic;
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'gfc-remove-category-btn';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = `Remove '${topic}'`;
+            removeBtn.onclick = () => removeUserCategory(cardData.id, topic);
+            tag.appendChild(removeBtn);
+            currentUserCategoriesContainer.appendChild(tag);
+        });
+    }
+
+    function addUserCategory() {
+        if (currentCards.length === 0) return;
+        const newCategory = newUserCategoryInput.value.trim();
+        if (!newCategory) return;
+
+        const cardData = currentCards[currentIndex];
+        if (!userCardCategories[cardData.id]) {
+            userCardCategories[cardData.id] = [];
+        }
+        
+        if (!userCardCategories[cardData.id].includes(newCategory)) {
+            userCardCategories[cardData.id].push(newCategory);
+            cardData.userTopics = userCardCategories[cardData.id];
+            saveUserCategories();
+            renderUserCategoriesForCurrentCard();
+            populateTopicFilter();
+        }
+        newUserCategoryInput.value = '';
+    }
+
+    function removeUserCategory(cardId, categoryToRemove) {
+        const card = allCardsData.find(c => c.id === cardId);
+        if (!card || !userCardCategories[cardId]) return;
+
+        userCardCategories[cardId] = userCardCategories[cardId].filter(topic => topic !== categoryToRemove);
+        
+        if (userCardCategories[cardId].length === 0) {
+            delete userCardCategories[cardId];
+        }
+        card.userTopics = userCardCategories[cardId] || [];
+       
+        saveUserCategories();
+        
+        if (activeTopicFilter === categoryToRemove) {
+            activeTopicFilter = 'all';
+        }
+
+        populateTopicFilter();
+        filterCards();
+    }
+
+    // --- OTHER UNCHANGED FUNCTIONS ---
+    function applyTheme(theme) {
+        container.classList.toggle('light-theme', theme === 'light');
+        themeIconSun.classList.toggle('gfc-hidden', theme !== 'light');
+        themeIconMoon.classList.toggle('gfc-hidden', theme === 'light');
+    }
+    function toggleTheme() {
+        const newTheme = container.classList.contains('light-theme') ? 'dark' : 'light';
+        applyTheme(newTheme);
+        try { localStorage.setItem(themeStorageKey, newTheme); } catch (e) { console.error("Failed to save theme state:", e); }
+    }
+    function loadTheme() {
+        const savedTheme = localStorage.getItem(themeStorageKey) || 'dark';
+        applyTheme(savedTheme);
+    }
+    function loadLearnedState() {
+        try {
+            const savedData = localStorage.getItem(learnedStorageKey);
+            if (savedData) {
+                const learnedIds = JSON.parse(savedData);
+                allCardsData.forEach(card => {
+                    if (learnedIds[card.id]) card.learned = true;
+                });
+            }
+        } catch (e) { console.error("Failed to load learned state:", e); }
+    }
+    function saveLearnedState() {
+        try {
+            const learnedData = allCardsData.reduce((acc, card) => {
+                if (card.learned) { acc[card.id] = true; }
+                return acc;
+            }, {});
+            localStorage.setItem(learnedStorageKey, JSON.stringify(learnedData));
+        } catch (e) { console.error("Failed to save learned state:", e); }
+    }
+    function flipCard(animate = true) {
+        isFlipped = !isFlipped;
+        if (!animate) cardElement.style.transition = 'none';
+        cardElement.classList.toggle('is-flipped', isFlipped);
+        if (!animate) setTimeout(() => cardElement.style.transition = '', 0);
+    }
+    function updateProgress() { 
+        progressIndicator.textContent = currentCards.length > 0 ? `${currentIndex + 1} / ${currentCards.length}` : `0 / 0`;
+    }
+    function showEmptyState() {
+        const titleText = document.querySelector('#gfc-dynamic-translations [data-key="empty-title"]').dataset[currentLanguage];
+        const subtitleText = document.querySelector('#gfc-dynamic-translations [data-key="empty-subtitle"]').dataset[currentLanguage];
+        wordFrontElement.textContent = titleText;
+        genderElement.textContent = '';
+        cardBackContent.innerHTML = `<p class="gfc-example" style="text-align: center;">${subtitleText}</p>`;
+        progressIndicator.textContent = "0 / 0";
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        learnedCheckbox.disabled = true;
+        newUserCategoryInput.disabled = true;
+        addCategoryBtn.disabled = true;
+        currentUserCategoriesContainer.innerHTML = '';
+        if (isFlipped) flipCard(false);
+    }
+    function showErrorState(message) {
+        showEmptyState();
+        wordFrontElement.textContent = "Error";
+        cardBackContent.innerHTML = `<p class="gfc-example" style="text-align: center;">${message}</p>`;
+        shuffleBtn.disabled = true;
+        filterSelect.disabled = true;
+        topicFilterSelect.disabled = true;
+    }
+    function updateNavButtons() {
+        const hasCards = currentCards.length > 0;
+        prevBtn.disabled = !hasCards || currentIndex <= 0;
+        nextBtn.disabled = !hasCards || currentIndex >= currentCards.length - 1;
+        learnedCheckbox.disabled = !hasCards;
+        newUserCategoryInput.disabled = !hasCards;
+        addCategoryBtn.disabled = !hasCards;
+    }
+    function showNextCard() {
+        if (currentIndex < currentCards.length - 1) {
+            currentIndex++;
+            renderCard();
+        }
+    }
+    function showPrevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCard();
+        }
+    }
+    function shuffleCards() {
+        if (currentCards.length === 0) return;
+        for (let i = currentCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+        }
+        currentIndex = 0;
+        renderCard();
+    }
+    function toggleLearnedStatus() {
+        if (currentCards.length > 0) {
+            const originalCard = allCardsData.find(card => card.id === currentCards[currentIndex].id);
+            if (originalCard) {
+                originalCard.learned = learnedCheckbox.checked;
+                saveLearnedState();
+            }
+        }
+        if (activeLearnedFilter !== 'all') {
+            setTimeout(filterCards, 200);
+        }
+    }
+    
+    // --- INITIALIZATION ---
+    function finishInitialization() {
+        loadLearnedState();
+        loadUserCategories(); 
+        updateUIText(currentLanguage);
+        filterCards(); 
+        
+        themeToggleButton.addEventListener('click', toggleTheme);
+        langToggleButton.addEventListener('click', toggleLanguage);
+        cardElement.addEventListener('click', () => flipCard(true));
+        nextBtn.addEventListener('click', showNextCard);
+        prevBtn.addEventListener('click', showPrevCard);
+        shuffleBtn.addEventListener('click', shuffleCards);
+        learnedCheckbox.addEventListener('change', toggleLearnedStatus);
+        
+        filterSelect.addEventListener('change', () => {
+            activeLearnedFilter = filterSelect.value;
+            filterCards();
+        });
+        topicFilterSelect.addEventListener('change', () => {
+            activeTopicFilter = topicFilterSelect.value;
+            filterCards();
+        });
+
+        addCategoryBtn.addEventListener('click', addUserCategory);
+        newUserCategoryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addUserCategory();
+            }
+        });
+    }
+
+    async function initializeApp() {
+        loadTheme();
+        loadLanguage();
+        const data = getCachedData() || await fetchAndParseSheetData();
+        if (data && data.length > 0) {
+            allCardsData = data;
+            finishInitialization();
+        }
+    }
+
+    initializeApp();
+})();
+    </script>
+</body>
+</html>
