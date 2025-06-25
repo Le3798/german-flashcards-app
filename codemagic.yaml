@@ -4,20 +4,25 @@
 workflows:
   capacitor-ios-build: # You can name this workflow anything you like
     name: Build Capacitor iOS App
-    instance_type: mac_mini_m2 # Use an Apple Silicon M2 machine to match your last build
+    instance_type: mac_mini_m2 # Use an Apple Silicon M2 machine
     environment:
       node: 18 # Specify the version of Node.js to use
     scripts:
-      - name: Install npm dependencies
+      - name: Install Dependencies and Prepare iOS Project
         script: | 
+          set -x # This will print all commands for easier debugging
+          
+          # Install Node dependencies
           npm install
-      - name: Sync Capacitor project
-        script: | 
-          # FIX: Use a direct path to the capacitor command instead of npx
+          
+          # FIX: Manually add execute permission to the Capacitor CLI
+          chmod +x ./node_modules/.bin/cap
+          
+          # Sync the web assets to the native project
           ./node_modules/.bin/cap sync ios
-      - name: Install iOS dependencies (CocoaPods)
-        script: | 
-          cd ios/App # Navigate into the correct iOS sub-directory
+          
+          # Install iOS CocoaPods dependencies
+          cd ios/App
           pod install
       - name: Build for iOS Simulator
         script: | 
